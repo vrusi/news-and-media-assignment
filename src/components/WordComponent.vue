@@ -1,11 +1,31 @@
 <script setup lang="ts">
-defineProps({
-    word: String,
-});
+import type { TWord } from '@/lib/ApiService';
+
+const props = defineProps<{
+    word: TWord;
+    isRemovingWords?: boolean;
+}>();
+
+const emit = defineEmits(['remove']);
+
+const onClick = () => {
+    emit('remove', props.word);
+};
 </script>
 
 <template>
-    <div class="word">{{ word }}</div>
+    <div :class="{ word: true, 'justify-space-between': isRemovingWords }">
+        {{ word.value }}
+
+        <Button
+            v-if="isRemovingWords"
+            icon="pi pi-trash"
+            severity="danger"
+            text
+            class="icon"
+            @click="onClick"
+        />
+    </div>
 </template>
 
 <style scoped>
@@ -15,10 +35,22 @@ defineProps({
     border-radius: 0.5rem;
     padding: 1rem;
     width: 100%;
-    text-align: center;
+    height: 4rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .word:hover {
     cursor: pointer;
+}
+
+.justify-space-between {
+    justify-content: space-between;
+}
+
+.icon {
+    padding: 0;
+    margin: 0;
 }
 </style>

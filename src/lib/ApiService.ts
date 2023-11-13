@@ -3,7 +3,7 @@ export type TWord = {
     value: string;
 };
 
-type TWordId = `${string}-${string}-${string}-${string}-${string}`;
+export type TWordId = `${string}-${string}-${string}-${string}-${string}`;
 
 const WORDS = ['Abaddon', 'abadejo'];
 
@@ -42,10 +42,10 @@ export default class ApiService {
         return wordA.id === wordB.id && wordA.value === wordB.value;
     }
 
-    async deleteWord(wordToDelete: TWord): Promise<void> {
+    async removeWord(idToDelete: TWordId): Promise<void> {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
-                this.words = this.words.filter((word) => !this.areWordsTheSame(word, wordToDelete));
+                this.words = this.words.filter((word) => word.id !== idToDelete);
                 resolve();
             }, 1000);
         });
