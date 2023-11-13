@@ -247,12 +247,27 @@ const onDrag = () => {
 @media screen and (min-width: 700px) {
     .content {
         height: 60vh;
-        overflow: hidden;
         border: 1px solid #ccc;
         border-radius: 6px;
         padding: 0 2rem;
         max-width: 20rem;
         margin: auto;
+        overflow: hidden;
+        overflow-y: scroll;
+    }
+
+    .content::-webkit-scrollbar-track {
+        -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+        background-color: transparent;
+    }
+
+    .content::-webkit-scrollbar {
+        width: 2px;
+        background-color: transparent;
+    }
+
+    .content::-webkit-scrollbar-thumb {
+        background-color: var(--primary-color);
     }
 
     .display-mobile {
