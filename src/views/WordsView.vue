@@ -4,7 +4,7 @@ import NewWordModal from '@/components/NewWordModal.vue';
 import RemoveWordModal from '@/components/RemoveWordModal.vue';
 import RemoveWordsButton from '@/components/RemoveWordsButton.vue';
 import WordComponent from '@/components/WordComponent.vue';
-import ApiService, { type TWord, ApiError } from '@/lib/ApiService';
+import ApiService, { ApiError, type TWord } from '@/lib/ApiService';
 import { onMounted, ref } from 'vue';
 import draggable from 'vuedraggable';
 
@@ -13,8 +13,11 @@ const words = ref<TWord[]>([]);
 const isAddWordModalOpen = ref(false);
 const isRemoveWordModalOpen = ref(false);
 const wordToRemove = ref<TWord | null>(null);
+const isRemovingWords = ref(false);
 
+const isLoading = ref(true);
 const isError = ref(false);
+const errorMessage = ref('');
 
 const setWordOrder = (): void => {
     localStorage.setItem('wordIds', JSON.stringify(words.value.map((word) => word.id)));
@@ -42,11 +45,16 @@ const orderWords = (): void => {
     });
 };
 
-onMounted(async () => {
+const loadData = async () => {
+    isLoading.value = true;
+    isError.value = false;
+    errorMessage.value = '';
+
     const response = await apiService.getWords();
 
     if (response instanceof ApiError) {
         isError.value = true;
+        isLoading.value = false;
         return;
     }
 
@@ -59,6 +67,11 @@ onMounted(async () => {
     } else {
         orderWords();
     }
+    isLoading.value = false;
+};
+
+onMounted(() => {
+    loadData();
 });
 
 const onAddNewWordClick = () => {
@@ -66,19 +79,20 @@ const onAddNewWordClick = () => {
 };
 
 const onAddNewWord = async (newWord: string) => {
-    const word = await apiService.addWord(newWord);
+    const response = await apiService.addWord(newWord);
 
-    if (!word) {
-        // TODO: handle errors
+    if (response instanceof ApiError) {
+        isError.value = true;
+        errorMessage.value = response.message;
         return;
     }
+
+    const word = response as TWord;
 
     setWordOrder();
     isAddWordModalOpen.value = false;
     words.value.push(word);
 };
-
-const isRemovingWords = ref(false);
 
 const onRemoveWordsClick = async () => {
     isRemovingWords.value = !isRemovingWords.value;
@@ -96,11 +110,18 @@ const onCloseRemoveWordModal = () => {
 
 const onRemoveWord = async () => {
     if (!wordToRemove.value) {
-        // TODO: handle errors
+        isRemoveWordModalOpen.value = false;
         return;
     }
 
-    await apiService.removeWord(wordToRemove.value!.id);
+    const response = await apiService.removeWord(wordToRemove.value.id);
+
+    if (response instanceof ApiError) {
+        isError.value = true;
+        errorMessage.value = response.message;
+        return;
+    }
+
     words.value = words.value.filter((word) => word.id !== wordToRemove.value!.id);
     setWordOrder();
 
@@ -122,40 +143,57 @@ const onDrag = () => {
 
 <template>
     <main class="container">
-        <h1>Words</h1>
+        <h1 class="text-center">Words</h1>
 
-        <new-word-modal
-            v-model:isModalOpen="isAddWordModalOpen"
-            @close="isAddWordModalOpen = false"
-            @addNewWord="onAddNewWord"
-        />
+        <template v-if="isLoading">
+            <div class="column">
+                <ProgressSpinner />
+                <span class="my-2">Loading...</span>
+            </div>
+        </template>
 
-        <remove-word-modal
-            v-if="wordToRemove"
-            v-model:isModalOpen="isRemoveWordModalOpen"
-            :word="wordToRemove"
-            @close="onCloseRemoveWordModal"
-            @remove="onRemoveWord"
-        />
+        <template v-else-if="isError">
+            <div class="column">
+                <i class="pi pi-exclamation-circle icon-error" />
+                <span class="my-2">Could not load data.</span>
+                <Button outlined rounded @click="loadData">Try again</Button>
+            </div>
+        </template>
 
-        <new-word-button v-if="!isRemovingWords" @click="onAddNewWordClick" />
+        <template v-else>
+            <new-word-modal
+                v-model:isModalOpen="isAddWordModalOpen"
+                @close="isAddWordModalOpen = false"
+                @addNewWord="onAddNewWord"
+            />
 
-        <remove-words-button @click="onRemoveWordsClick" :isRemovingWords="isRemovingWords" />
+            <remove-word-modal
+                v-if="wordToRemove"
+                v-model:isModalOpen="isRemoveWordModalOpen"
+                :word="wordToRemove"
+                @close="onCloseRemoveWordModal"
+                @remove="onRemoveWord"
+            />
 
-        <draggable
-            v-model="words"
-            itemKey="id"
-            :component-data="getDraggableData()"
-            @update="onDrag"
-        >
-            <template #item="{ element }">
-                <word-component
-                    :modelValue="element"
-                    :isRemovingWords="isRemovingWords"
-                    @remove="onRemoveWordClick"
-                />
-            </template>
-        </draggable>
+            <new-word-button v-if="!isRemovingWords" @click="onAddNewWordClick" />
+
+            <remove-words-button @click="onRemoveWordsClick" :isRemovingWords="isRemovingWords" />
+
+            <draggable
+                v-model="words"
+                itemKey="id"
+                :component-data="getDraggableData()"
+                @update="onDrag"
+            >
+                <template #item="{ element }">
+                    <word-component
+                        :modelValue="element"
+                        :isRemovingWords="isRemovingWords"
+                        @remove="onRemoveWordClick"
+                    />
+                </template>
+            </draggable>
+        </template>
     </main>
 </template>
 
@@ -165,7 +203,16 @@ const onDrag = () => {
     max-width: 40vw;
 }
 
-#draggable-wrapper {
-    position: absolute;
+.column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-error {
+    color: #ef4444;
+    font-size: 6rem;
+    margin-bottom: 1rem;
 }
 </style>

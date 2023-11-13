@@ -12,11 +12,15 @@ import PrimeVue from 'primevue/config';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';
+import ProgressSpinner from 'primevue/progressspinner';
 
 const app = createApp(App);
 
 app.use(router).use(PrimeVue);
 
-app.component('Button', Button).component('Dialog', Dialog).component('InputText', InputText);
+app.component('Button', Button)
+    .component('Dialog', Dialog)
+    .component('InputText', InputText)
+    .component('ProgressSpinner', ProgressSpinner);
 
 app.mount('#app');
