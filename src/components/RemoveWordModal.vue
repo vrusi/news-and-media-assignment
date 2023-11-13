@@ -30,7 +30,7 @@ const onClose = () => {
             {{ word.value }}
         </div>
 
-        <Button label="Remove" class="w-100" @click="onRemove" severity="danger"/>
+        <Button label="Remove" class="w-100" @click="onRemove" severity="danger" />
     </Dialog>
 </template>
 

@@ -2,20 +2,20 @@
 import type { TWord } from '@/lib/ApiService';
 
 const props = defineProps<{
-    word: TWord;
+    modelValue: TWord;
     isRemovingWords?: boolean;
 }>();
 
 const emit = defineEmits(['remove']);
 
 const onClick = () => {
-    emit('remove', props.word);
+    emit('remove', props.modelValue);
 };
 </script>
 
 <template>
     <div :class="{ word: true, 'justify-space-between': isRemovingWords }">
-        {{ word.value }}
+        {{ modelValue.value }}
 
         <Button
             v-if="isRemovingWords"
@@ -39,6 +39,7 @@ const onClick = () => {
     display: flex;
     justify-content: center;
     align-items: center;
+    background-color: white;
 }
 
 .word:hover {
