@@ -161,38 +161,74 @@ const onDrag = () => {
         </template>
 
         <template v-else>
-            <new-word-modal
-                v-model:isModalOpen="isAddWordModalOpen"
-                @close="isAddWordModalOpen = false"
-                @addNewWord="onAddNewWord"
-            />
-
-            <remove-word-modal
-                v-if="wordToRemove"
-                v-model:isModalOpen="isRemoveWordModalOpen"
-                :word="wordToRemove"
-                @close="onCloseRemoveWordModal"
-                @remove="onRemoveWord"
-            />
-
-            <new-word-button v-if="!isRemovingWords" @click="onAddNewWordClick" />
-
-            <remove-words-button @click="onRemoveWordsClick" :isRemovingWords="isRemovingWords" />
-
-            <draggable
-                v-model="words"
-                itemKey="id"
-                :component-data="getDraggableData()"
-                @update="onDrag"
-            >
-                <template #item="{ element }">
-                    <word-component
-                        :modelValue="element"
-                        :isRemovingWords="isRemovingWords"
-                        @remove="onRemoveWordClick"
+            <div class="content">
+                <div class="display-mobile">
+                    <remove-word-modal
+                        v-if="wordToRemove"
+                        v-model:isModalOpen="isRemoveWordModalOpen"
+                        :word="wordToRemove"
+                        @close="onCloseRemoveWordModal"
+                        @remove="onRemoveWord"
                     />
-                </template>
-            </draggable>
+
+                    <new-word-modal
+                        v-model:isModalOpen="isAddWordModalOpen"
+                        @close="isAddWordModalOpen = false"
+                        @addNewWord="onAddNewWord"
+                    />
+
+                    <remove-words-button
+                        @click="onRemoveWordsClick"
+                        :isRemovingWords="isRemovingWords"
+                    />
+
+                    <new-word-button v-if="!isRemovingWords" @click="onAddNewWordClick" />
+                </div>
+
+                <draggable
+                    v-model="words"
+                    itemKey="id"
+                    :component-data="getDraggableData()"
+                    @update="onDrag"
+                >
+                    <template #item="{ element }">
+                        <word-component
+                            :modelValue="element"
+                            :isRemovingWords="isRemovingWords"
+                            @remove="onRemoveWordClick"
+                        />
+                    </template>
+                </draggable>
+            </div>
+
+            <div class="display-desktop w-100 my-2">
+                <Button
+                    v-if="!isRemovingWords"
+                    class="w-100 text-center mr-1"
+                    severity="danger"
+                    outlined
+                    @click="onRemoveWordsClick"
+                >
+                    <span class="w-100 text-center"> Remove </span>
+                </Button>
+
+                <Button
+                    v-else
+                    class="w-100 text-center"
+                    severity="secondary"
+                    @click="onRemoveWordsClick"
+                >
+                    <span class="w-100 text-center"> Cancel </span>
+                </Button>
+
+                <Button
+                    v-if="!isRemovingWords"
+                    class="w-100 text-center ml-2"
+                    @click="onAddNewWordClick"
+                >
+                    <span class="w-100 text-center"> Create </span>
+                </Button>
+            </div>
         </template>
     </main>
 </template>
@@ -202,5 +238,34 @@ const onDrag = () => {
     color: #ef4444;
     font-size: 6rem;
     margin-bottom: 1rem;
+}
+
+.display-desktop {
+    display: none;
+}
+
+@media screen and (min-width: 700px) {
+    .content {
+        height: 60vh;
+        overflow: hidden;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        padding: 0 2rem;
+        max-width: 20rem;
+        margin: auto;
+    }
+
+    .display-mobile {
+        display: none;
+    }
+
+    .display-desktop {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        max-width: 20rem;
+        margin-left: auto;
+        margin-right: auto;
+    }
 }
 </style>

@@ -23,8 +23,7 @@ const onClose = () => {
         @update:visible="onClose"
         modal
         header="Are you sure you want to remove this word?"
-        :style="{ width: '50rem' }"
-        :breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
+        class="modal"
     >
         <div class="word">
             {{ word.value }}

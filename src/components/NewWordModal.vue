@@ -25,8 +25,7 @@ const onClose = () => {
         @update:visible="onClose"
         modal
         header="New Word"
-        :style="{ width: '50rem' }"
-        :breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
+        class="modal"
     >
         <InputText
             class="w-100 mb-1"

@@ -12,8 +12,10 @@ import AppToolbar from '@/components/AppToolbar.vue';
         </template>
 
         <template #fallback>
-            <ProgressSpinner />
-            <div>Loading...</div>
+            <div>
+                <ProgressSpinner />
+                <div>Loading...</div>
+            </div>
         </template>
     </Suspense>
 </template>
