@@ -197,19 +197,7 @@ const onDrag = () => {
     </main>
 </template>
 
-<style>
-.container {
-    margin: 0 auto;
-    max-width: 40vw;
-}
-
-.column {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
+<style scoped>
 .icon-error {
     color: #ef4444;
     font-size: 6rem;

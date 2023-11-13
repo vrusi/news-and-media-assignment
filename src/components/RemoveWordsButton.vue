@@ -17,7 +17,7 @@ const severity = computed(() => {
 </script>
 
 <template>
-    <Button class="float" :icon="icon" rounded @click="$emit('click')" :severity="severity" />
+    <Button class="float large" :icon="icon" rounded @click="$emit('click')" :severity="severity" />
 </template>
 
 <style scoped>
@@ -26,5 +26,10 @@ const severity = computed(() => {
     bottom: 2rem;
     left: 2rem;
     box-shadow: 2px 2px 3px #999;
+}
+
+.large {
+    width: 4rem;
+    height: 4rem;
 }
 </style>
