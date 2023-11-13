@@ -81,6 +81,7 @@ const onRemoveWord = async () => {
         />
 
         <new-word-button v-if="!isRemovingWords" @click="onAddNewWordClick" />
+
         <remove-words-button @click="onRemoveWordsClick" :isRemovingWords="isRemovingWords" />
 
         <word-component
