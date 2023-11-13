@@ -2,7 +2,8 @@ import axios from 'axios';
 
 const API_URL_3_WORDS = 'https://run.mocky.io/v3/80b9b658-fc89-4546-9e70-68be0e7b5ff1';
 const API_URL_10_WORDS = 'https://run.mocky.io/v3/68b65f8d-8502-4cce-b6e5-5a4042e44d97';
-const API_CURRENT = API_URL_10_WORDS;
+const API_URL_15K_WORDS = 'https://run.mocky.io/v3/9c7da90e-48b9-42ab-b942-3ab802c1117b';
+const API_CURRENT = API_URL_15K_WORDS;
 
 export type TWord = {
     id: TWordId;
@@ -32,7 +33,6 @@ export default class ApiService {
             if (response.status === 200) {
                 this.words = response.data.words;
                 return this.words;
-
             } else {
                 return new ApiError('Error while fetching words.');
             }

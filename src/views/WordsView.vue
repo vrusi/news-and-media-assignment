@@ -5,7 +5,8 @@ import RemoveWordModal from '@/components/RemoveWordModal.vue';
 import RemoveWordsButton from '@/components/RemoveWordsButton.vue';
 import WordComponent from '@/components/WordComponent.vue';
 import ApiService, { ApiError, type TWord } from '@/lib/ApiService';
-import { onMounted, ref } from 'vue';
+
+import { onMounted, ref, watch } from 'vue';
 import draggable from 'vuedraggable';
 
 const apiService = new ApiService();
@@ -18,6 +19,8 @@ const isRemovingWords = ref(false);
 const isLoading = ref(true);
 const isError = ref(false);
 const errorMessage = ref('');
+
+const emit = defineEmits(['wordCount']);
 
 const setWordOrder = (): void => {
     localStorage.setItem('wordIds', JSON.stringify(words.value.map((word) => word.id)));
@@ -139,6 +142,11 @@ const getDraggableData = () => {
 const onDrag = () => {
     setWordOrder();
 };
+
+watch(words, () => {
+    setWordOrder();
+    emit('wordCount', words.value.length);
+});
 </script>
 
 <template>

@@ -1,14 +1,21 @@
 <script setup lang="ts">
+import { ref } from 'vue';
 import { RouterView } from 'vue-router';
 import AppToolbar from '@/components/AppToolbar.vue';
+
+const wordCount = ref(0);
+
+const onWordCount = (newWordCount: number) => {
+    wordCount.value = newWordCount;
+};
 </script>
 
 <template>
-    <AppToolbar />
+    <AppToolbar :wordCount="wordCount" />
 
     <Suspense>
         <template #default>
-            <RouterView />
+            <RouterView @wordCount="onWordCount" />
         </template>
 
         <template #fallback>
