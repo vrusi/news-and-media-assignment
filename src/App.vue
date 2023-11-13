@@ -1,3 +1,8 @@
+<script setup lang="ts">
+
+import { RouterView } from 'vue-router';
+</script>
+
 <template>
     <header>
         <h1>News and media assignment</h1>
@@ -14,8 +19,3 @@
         </template>
     </Suspense>
 </template>
-
-<script setup lang="ts">
-import { Suspense } from 'vue';
-import { RouterView } from 'vue-router';
-</script>

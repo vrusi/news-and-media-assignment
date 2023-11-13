@@ -1,12 +1,12 @@
-<template>
-    <div class="word">{{ word }}</div>
-</template>
-
 <script setup lang="ts">
 defineProps({
     word: String,
 });
 </script>
+
+<template>
+    <div class="word">{{ word }}</div>
+</template>
 
 <style scoped>
 .word {
@@ -21,7 +21,4 @@ defineProps({
 .word:hover {
     cursor: pointer;
 }
-
-
-
 </style>
