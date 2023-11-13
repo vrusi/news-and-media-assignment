@@ -28,7 +28,8 @@ export default class ApiService {
             );
 
             if (response.status === 200) {
-                return response.data.words;
+                this.words = response.data.words;
+                return this.words;
             } else {
                 return new ApiError('Error while fetching words.');
             }

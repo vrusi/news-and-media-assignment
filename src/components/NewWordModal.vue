@@ -20,13 +20,7 @@ const onClose = () => {
 </script>
 
 <template>
-    <Dialog
-        :visible="isModalOpen"
-        @update:visible="onClose"
-        modal
-        header="New Word"
-        class="modal"
-    >
+    <Dialog :visible="isModalOpen" @update:visible="onClose" modal header="New Word" class="modal">
         <InputText
             class="w-100 mb-1"
             type="text"
