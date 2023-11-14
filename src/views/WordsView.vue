@@ -53,7 +53,7 @@ const loadData = async () => {
     isError.value = false;
     errorMessage.value = '';
 
-    const response = await apiService.getWords();
+    const response = await apiService.fetchWords();
 
     if (response instanceof ApiError) {
         isError.value = true;
