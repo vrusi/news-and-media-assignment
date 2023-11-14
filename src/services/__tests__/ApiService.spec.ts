@@ -56,7 +56,7 @@ describe('API Service', () => {
                 status: 500,
             });
 
-            const apiService = new ApiService();
+            const apiService = new ApiService(API_URLS.WORDS_3);
             const response = await apiService.fetchWords();
 
             expect(axios.get).toHaveBeenCalledWith(API_URLS.WORDS_3);
