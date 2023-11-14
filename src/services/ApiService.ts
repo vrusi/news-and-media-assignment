@@ -6,7 +6,7 @@ export const API_URLS = {
     WORDS_15K: 'https://run.mocky.io/v3/9c7da90e-48b9-42ab-b942-3ab802c1117b',
 };
 
-const API_CURRENT = API_URLS.WORDS_3;
+const API_CURRENT = API_URLS.WORDS_15K;
 
 export type TWord = {
     id: TWordId;

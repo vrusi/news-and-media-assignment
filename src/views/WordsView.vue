@@ -1,103 +1,46 @@
 <script setup lang="ts">
 import NewWordButton from '@/components/NewWordButton.vue';
+import NewWordButtonLarge from '@/components/NewWordButtonLarge.vue';
 import NewWordModal from '@/components/NewWordModal.vue';
 import RemoveWordModal from '@/components/RemoveWordModal.vue';
 import RemoveWordsButton from '@/components/RemoveWordsButton.vue';
+import RemoveWordsButtonLarge from '@/components/RemoveWordsButtonLarge.vue';
 import WordComponent from '@/components/WordComponent.vue';
-import ApiService, { ApiError, type TWord } from '@/lib/ApiService';
-
-import { onMounted, ref, watch } from 'vue';
+import { useApiService } from '@/composables/useApiService';
+import { useLocalStorage } from '@/composables/useLocalStorage';
+import { type TWord } from '@/services/ApiService';
+import { defineEmits, onMounted, watch } from 'vue';
 import draggable from 'vuedraggable';
 
-const apiService = new ApiService();
-const words = ref<TWord[]>([]);
-const isAddWordModalOpen = ref(false);
-const isRemoveWordModalOpen = ref(false);
-const wordToRemove = ref<TWord | null>(null);
-const isRemovingWords = ref(false);
+const {
+    words,
+    isAddWordModalOpen,
+    isRemoveWordModalOpen,
+    wordToRemove,
+    isRemovingWords,
+    isLoading,
+    isError,
+    loadData,
+    addWord,
+    removeWord,
+} = useApiService();
 
-const isLoading = ref(true);
-const isError = ref(false);
-const errorMessage = ref('');
+const { setWordOrder } = useLocalStorage();
 
 const emit = defineEmits(['wordCount']);
 
-const setWordOrder = (): void => {
-    localStorage.setItem('wordIds', JSON.stringify(words.value.map((word) => word.id)));
-};
+onMounted(loadData);
 
-const getWordOrder = (): Array<string> => {
-    const localStorageWordIds = localStorage.getItem('wordIds');
-    if (!localStorageWordIds) {
-        return [];
-    }
+watch(
+    words,
+    () => {
+        setWordOrder(words.value);
+        emit('wordCount', words.value.length);
+    },
+    { deep: true },
+);
 
-    return JSON.parse(localStorageWordIds);
-};
-
-const orderWords = (): void => {
-    const wordsUnordered = words.value;
-
-    if (!wordsUnordered) {
-        return;
-    }
-
-    const order = getWordOrder();
-    words.value = [...wordsUnordered].sort((a, b) => {
-        return order.indexOf(a.id) - order.indexOf(b.id);
-    });
-};
-
-const loadData = async () => {
-    isLoading.value = true;
-    isError.value = false;
-    errorMessage.value = '';
-
-    const response = await apiService.fetchWords();
-
-    if (response instanceof ApiError) {
-        isError.value = true;
-        isLoading.value = false;
-        return;
-    }
-
-    words.value = response as TWord[];
-
-    const localStorageWordIds = localStorage.getItem('wordIds');
-
-    if (!localStorageWordIds) {
-        setWordOrder();
-    } else {
-        orderWords();
-    }
-    isLoading.value = false;
-};
-
-onMounted(() => {
-    loadData();
-});
-
-const onAddNewWordClick = () => {
-    isAddWordModalOpen.value = true;
-};
-
-const onAddNewWord = async (newWord: string) => {
-    const response = await apiService.addWord(newWord);
-
-    if (response instanceof ApiError) {
-        isError.value = true;
-        errorMessage.value = response.message;
-        return;
-    }
-
-    const word = response as TWord;
-
-    setWordOrder();
-    isAddWordModalOpen.value = false;
-    words.value.push(word);
-};
-
-const onRemoveWordsClick = async () => {
+const onRemoveWordsButtonClick = async () => {
     isRemovingWords.value = !isRemovingWords.value;
 };
 
@@ -111,27 +54,6 @@ const onCloseRemoveWordModal = () => {
     wordToRemove.value = null;
 };
 
-const onRemoveWord = async () => {
-    if (!wordToRemove.value) {
-        isRemoveWordModalOpen.value = false;
-        return;
-    }
-
-    const response = await apiService.removeWord(wordToRemove.value.id);
-
-    if (response instanceof ApiError) {
-        isError.value = true;
-        errorMessage.value = response.message;
-        return;
-    }
-
-    words.value = words.value.filter((word) => word.id !== wordToRemove.value!.id);
-    setWordOrder();
-
-    wordToRemove.value = null;
-    isRemoveWordModalOpen.value = false;
-};
-
 const getDraggableData = () => {
     return {
         isRemovingWords: isRemovingWords.value,
@@ -140,13 +62,8 @@ const getDraggableData = () => {
 };
 
 const onDrag = () => {
-    setWordOrder();
+    setWordOrder(words.value);
 };
-
-watch(words, () => {
-    setWordOrder();
-    emit('wordCount', words.value.length);
-});
 </script>
 
 <template>
@@ -156,7 +73,7 @@ watch(words, () => {
         <template v-if="isLoading">
             <div class="column">
                 <ProgressSpinner />
-                <span class="my-2">Loading...</span>
+                <span class="my-2"> Loading... </span>
             </div>
         </template>
 
@@ -170,27 +87,27 @@ watch(words, () => {
 
         <template v-else>
             <div class="content">
-                <div class="display-mobile">
-                    <remove-word-modal
+                <div class="hide-desktop">
+                    <RemoveWordModal
                         v-if="wordToRemove"
                         v-model:isModalOpen="isRemoveWordModalOpen"
                         :word="wordToRemove"
                         @close="onCloseRemoveWordModal"
-                        @remove="onRemoveWord"
+                        @remove="removeWord(wordToRemove.id)"
                     />
 
-                    <new-word-modal
+                    <NewWordModal
                         v-model:isModalOpen="isAddWordModalOpen"
                         @close="isAddWordModalOpen = false"
-                        @addNewWord="onAddNewWord"
+                        @addNewWord="addWord"
                     />
 
-                    <remove-words-button
-                        @click="onRemoveWordsClick"
-                        :isRemovingWords="isRemovingWords"
+                    <RemoveWordsButton
+                        :is-removing-words="isRemovingWords"
+                        @click="onRemoveWordsButtonClick"
                     />
 
-                    <new-word-button v-if="!isRemovingWords" @click="onAddNewWordClick" />
+                    <NewWordButton v-if="!isRemovingWords" @click="isAddWordModalOpen = true" />
                 </div>
 
                 <draggable
@@ -202,40 +119,23 @@ watch(words, () => {
                     <template #item="{ element }">
                         <word-component
                             :modelValue="element"
-                            :isRemovingWords="isRemovingWords"
+                            :is-removing-words="isRemovingWords"
                             @remove="onRemoveWordClick"
                         />
                     </template>
                 </draggable>
             </div>
 
-            <div class="display-desktop w-100 my-2">
-                <Button
-                    v-if="!isRemovingWords"
-                    class="w-100 text-center mr-1"
-                    severity="danger"
-                    outlined
-                    @click="onRemoveWordsClick"
-                >
-                    <span class="w-100 text-center"> Remove </span>
-                </Button>
+            <div class="hide-mobile w-100 my-2">
+                <RemoveWordsButtonLarge
+                    :is-removing-words="isRemovingWords"
+                    @click="onRemoveWordsButtonClick"
+                />
 
-                <Button
-                    v-else
-                    class="w-100 text-center"
-                    severity="secondary"
-                    @click="onRemoveWordsClick"
-                >
-                    <span class="w-100 text-center"> Cancel </span>
-                </Button>
-
-                <Button
-                    v-if="!isRemovingWords"
-                    class="w-100 text-center ml-2"
-                    @click="onAddNewWordClick"
-                >
-                    <span class="w-100 text-center"> Create </span>
-                </Button>
+                <NewWordButtonLarge
+                    :is-removing-words="isRemovingWords"
+                    @click="isAddWordModalOpen = true"
+                />
             </div>
         </template>
     </main>
@@ -248,7 +148,7 @@ watch(words, () => {
     margin-bottom: 1rem;
 }
 
-.display-desktop {
+.hide-mobile {
     display: none;
 }
 
@@ -278,11 +178,11 @@ watch(words, () => {
         background-color: var(--primary-color);
     }
 
-    .display-mobile {
+    .hide-desktop {
         display: none;
     }
 
-    .display-desktop {
+    .hide-mobile {
         display: flex;
         justify-content: space-between;
         align-items: center;

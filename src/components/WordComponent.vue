@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { TWord } from '@/lib/ApiService';
+import type { TWord } from '@/services/ApiService';
 import { computed } from 'vue';
 
 const props = defineProps<{
