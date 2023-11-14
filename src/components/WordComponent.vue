@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { TWord } from '@/lib/ApiService';
+import { computed } from 'vue';
 
 const props = defineProps<{
     modelValue: TWord;
@@ -11,11 +12,13 @@ const emit = defineEmits(['remove']);
 const onClick = () => {
     emit('remove', props.modelValue);
 };
+
+const word = computed(() => props.modelValue.value);
 </script>
 
 <template>
     <div :class="{ word: true, 'justify-space-between': isRemovingWords }">
-        {{ modelValue.value }}
+        {{ word }}
 
         <Button
             v-if="isRemovingWords"
