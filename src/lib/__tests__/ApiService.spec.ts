@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import ApiService, { API_URLS, ApiError, type TWord } from '../ApiService';
 import axios from 'axios';
 
@@ -20,7 +20,7 @@ describe('API Service', () => {
             expect(valuesActual).toStrictEqual(valuesExpected);
         };
 
-        test('calls a GET request to get the words', async () => {
+        it('calls a GET request to get the words', async () => {
             const wordsMock = {
                 words: [
                     {
@@ -51,7 +51,7 @@ describe('API Service', () => {
             assertWordsMatch(wordsMock.words as TWord[], words as TWord[]);
         });
 
-        test('returns an error if the request fails', async () => {
+        it('returns an error if the request fails', async () => {
             (axios.get as any).mockResolvedValue({
                 status: 500,
             });
