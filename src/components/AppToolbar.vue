@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router';
 
-const props = defineProps<{
+defineProps<{
     wordCount: number;
 }>();
 </script>
@@ -17,10 +17,12 @@ const props = defineProps<{
                     <i class="pi pi-info-circle router-button-icon" />
                 </RouterLink>
             </template>
+
             <template #end> {{ wordCount }} words </template>
         </Toolbar>
     </header>
 </template>
+
 <style scoped>
 .router-button-icon {
     padding: 0 1rem;

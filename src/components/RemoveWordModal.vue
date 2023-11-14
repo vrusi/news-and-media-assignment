@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { TWord } from '@/lib/ApiService';
+import type { TWord } from '@/services/ApiService';
 
 defineProps<{
     isModalOpen?: boolean;
@@ -40,3 +40,4 @@ const onClose = () => {
     font-size: 2rem;
 }
 </style>
+@/services/ApiService
